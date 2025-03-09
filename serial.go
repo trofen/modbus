@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/goburrow/serial"
+	"go.bug.st/serial"
 )
 
 const (
@@ -22,10 +22,11 @@ const (
 // serialPort has configuration and I/O controller.
 type serialPort struct {
 	// Serial port configuration.
-	serial.Config
-
+	serial.Mode
+	Address     string
 	Logger      *log.Logger
 	IdleTimeout time.Duration
+	Timeout     time.Duration
 
 	mu sync.Mutex
 	// port is platform-dependent data structure for serial port.
@@ -44,7 +45,7 @@ func (mb *serialPort) Connect() (err error) {
 // connect connects to the serial port if it is not connected. Caller must hold the mutex.
 func (mb *serialPort) connect() error {
 	if mb.port == nil {
-		port, err := serial.Open(&mb.Config)
+		port, err := serial.Open(mb.Address, &mb.Mode)
 		if err != nil {
 			return err
 		}
